@@ -134,13 +134,13 @@ def chat(site_id: str, conversation_id: str | None, user_text: str, visitor_meta
     else:
         reply_text, lead, usage = _run_claude(site, conv["id"], system, api_messages, history, on_text)
 
-    cited = sorted({int(n) for n in re.findall(r"\[(\d{1,2})\]", reply_text)})
+    cited = sorted({int(n) for grp in re.findall(r"\[(\d{1,2}(?:\s*,\s*\d{1,2})*)\]", reply_text) for n in re.split(r"\s*,\s*", grp)})
     sources, seen = [], set()
     for n in cited:
         if 1 <= n <= len(chunks) and chunks[n - 1]["url"] not in seen:
             seen.add(chunks[n - 1]["url"])
             sources.append({"title": chunks[n - 1]["title"], "url": chunks[n - 1]["url"]})
-    clean = re.sub(r"\s*\[\d{1,2}\]", "", reply_text).strip()
+    clean = re.sub(r"\s*\[\d{1,2}(?:\s*,\s*\d{1,2})*\]", "", reply_text).strip()
 
     history.append({"role": "user", "content": user_text, "ts": time.time()})
     history.append({"role": "assistant", "content": clean, "sources": sources, "ts": time.time(),

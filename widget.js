@@ -63,7 +63,7 @@
 
   function paint() {
     btn.style.background = cfg.accent; panel.querySelector('.ucz-head').style.background = cfg.accent;
-    send.style.background = cfg.accent; title.textContent = cfg.agent_name + (cfg.name ? ' · ' + cfg.name : '');
+    send.style.background = cfg.accent; title.textContent = cfg.agent_name; var sm = panel.querySelector('.ucz-head small'); if (sm && cfg.name) sm.textContent = cfg.name;
     quick.innerHTML = '';
     (cfg.quick_replies || []).forEach(function (q) {
       var b = document.createElement('button'); b.textContent = q; b.style.borderColor = cfg.accent; b.style.color = cfg.accent;
@@ -71,8 +71,10 @@
     });
   }
 
+  function fmt(t) { return String(t).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/^\s*[-•]\s+/gm, '• '); }
   function add(role, text, sources) {
-    var d = document.createElement('div'); d.className = 'ucz-m ' + (role === 'user' ? 'u' : 'a'); d.textContent = text;
+    var d = document.createElement('div'); d.className = 'ucz-m ' + (role === 'user' ? 'u' : 'a');
+    if (role === 'user') d.textContent = text; else d.innerHTML = fmt(text);
     if (role === 'user') d.style.background = cfg.accent;
     if (sources && sources.length) {
       var s = document.createElement('div'); s.className = 'ucz-src';
@@ -125,7 +127,7 @@
               if (ev === 'delta') {
                 typing(false); acc += j.t;
                 if (!bubble) bubble = add('assistant', '');
-                bubble.textContent = acc.replace(/\s*\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g, ''); msgs.scrollTop = msgs.scrollHeight;
+                bubble.innerHTML = fmt(acc.replace(/\s*\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g, '')); msgs.scrollTop = msgs.scrollHeight;
               } else if (ev === 'done') result = j;
               else if (ev === 'error') throw new Error(j);
             });

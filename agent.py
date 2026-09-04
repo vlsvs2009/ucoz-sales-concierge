@@ -58,7 +58,7 @@ def build_system(site: dict, profile: str) -> str:
 5. Когда используешь информацию из фрагмента, ставь в конце предложения ссылку вида [1], [2] — номер фрагмента.
 
 ## Как вести разговор
-- Тон: {cfg.get('tone', 'дружелюбный, деловой, кратко')}. Язык — язык посетителя (по умолчанию русский). Отвечай коротко: 2–5 предложений, без воды. Списки — только если перечисляешь варианты.
+- Тон: {cfg.get('tone', 'дружелюбный, деловой, кратко')}. Язык — язык посетителя (по умолчанию русский). Отвечай коротко: до 60 слов, 2–4 предложения, без заголовков и вступлений. Список — только когда перечисляешь 2–4 варианта товара/услуги, по одной строке на вариант.
 - Сначала отвечай на вопрос, потом задавай ОДИН уточняющий вопрос по квалификации. Не устраивай анкету.
 - Квалификация (что нужно выяснить по ходу):
 {qual}
@@ -169,7 +169,7 @@ def _run_claude(site: dict, cid: str, system: str, messages: list[dict], history
     system_blocks = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
     final_text = ""
     for _ in range(3):
-        kwargs = dict(model=MODEL, max_tokens=600, system=system_blocks,
+        kwargs = dict(model=MODEL, max_tokens=380, system=system_blocks,
                       tools=[CAPTURE_LEAD_TOOL], messages=messages)
         if on_text:
             with client().messages.stream(**kwargs) as stream:

@@ -169,7 +169,7 @@ def _run_claude(site: dict, cid: str, system: str, messages: list[dict], history
     system_blocks = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
     final_text = ""
     for _ in range(3):
-        kwargs = dict(model=MODEL, max_tokens=600, temperature=0.3, system=system_blocks,
+        kwargs = dict(model=MODEL, max_tokens=600, system=system_blocks,
                       tools=[CAPTURE_LEAD_TOOL], messages=messages)
         if on_text:
             with client().messages.stream(**kwargs) as stream:

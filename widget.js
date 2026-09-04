@@ -125,7 +125,7 @@
               if (ev === 'delta') {
                 typing(false); acc += j.t;
                 if (!bubble) bubble = add('assistant', '');
-                bubble.textContent = acc.replace(/\s*\[\d{1,2}\]/g, ''); msgs.scrollTop = msgs.scrollHeight;
+                bubble.textContent = acc.replace(/\s*\[\d{1,2}(?:\s*,\s*\d{1,2})*\]/g, ''); msgs.scrollTop = msgs.scrollHeight;
               } else if (ev === 'done') result = j;
               else if (ev === 'error') throw new Error(j);
             });

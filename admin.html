@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Sales Concierge — сайты</title>
+<style>
+:root{--acc:#2563eb}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f6f7f9;margin:0;color:#111}
+.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 28px;display:flex;align-items:center;gap:12px}
+.top b{font-size:16px}.top span{color:#6b7280;font-size:13px}
+main{max-width:1000px;margin:28px auto;padding:0 20px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;margin-bottom:18px}
+h2{font-size:16px;margin:0 0 12px}
+.row{display:flex;gap:10px}
+input{flex:1;padding:10px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px}
+button{padding:10px 16px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:14px;cursor:pointer;white-space:nowrap}
+button.sec{background:#fff;color:#111;border:1px solid #d1d5db}
+table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;color:#6b7280;font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid #e5e7eb}td{padding:10px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+a{color:var(--acc);text-decoration:none}
+.st{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px}.st.ready{background:#d1fae5;color:#065f46}.st.indexing{background:#fef3c7;color:#92400e}.st.error{background:#fee2e2;color:#991b1b}.st.new{background:#e5e7eb}
+.muted{color:#6b7280;font-size:12px}
+.hint{font-size:13px;color:#4b5563;margin-top:10px}
+</style></head><body>
+<div class="top"><b>AI Sales Concierge</b><span>для сайтов на uCoz · кабинет владельца</span></div>
+<main>
+<div class="card"><h2>Подключить сайт</h2>
+<div class="row"><input id="url" placeholder="https://your-site.ucoz.ru" autofocus><input id="name" placeholder="Название (необязательно)" style="max-width:260px"><button onclick="addSite()">Проиндексировать</button></div>
+<div class="hint">Агент обойдёт страницы сайта (sitemap + ссылки, до 150 страниц), соберёт базу знаний и через минуту выдаст сниппет для установки.</div></div>
+<div class="card"><h2>Сайты</h2><table><thead><tr><th>Сайт</th><th>Статус</th><th>Страниц</th><th>Диалогов</th><th>Лидов</th><th>Конверсия</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+</main>
+<script>
+const T = document.cookie.match(/admin_token=([^;]+)/)?.[1] || new URLSearchParams(location.search).get('token');
+const H = {'X-Admin-Token': T, 'Content-Type': 'application/json'};
+async function load(){
+  const r = await fetch('/api/sites',{headers:H}); if(r.status===401){location.href='/admin';return}
+  const sites = await r.json();
+  document.getElementById('rows').innerHTML = sites.map(s=>`<tr>
+    <td><a href="/admin/site/${s.id}"><b>${esc(s.name||s.url)}</b></a><div class="muted">${esc(s.url)}</div></td>
+    <td><span class="st ${s.status}">${({ready:'готов',indexing:'индексация…',error:'ошибка',new:'новый'})[s.status]||s.status}</span><div class="muted">${esc(s.status_detail||'')}</div></td>
+    <td>${s.pages_count}</td><td>${s.stats.conversations}</td><td>${s.stats.leads} <span class="muted">${s.stats.hot_leads?'🔥'+s.stats.hot_leads:''}</span></td><td>${s.stats.conversion}%</td>
+    <td><a href="/demo/${s.id}?concierge=open" target="_blank">демо ↗</a></td></tr>`).join('') || '<tr><td colspan=7 class="muted">Пока нет сайтов</td></tr>';
+  if (sites.some(s=>s.status==='indexing'||s.status==='new')) setTimeout(load, 1500);
+}
+async function addSite(){
+  const url=document.getElementById('url').value.trim(); if(!url) return;
+  const r = await fetch('/api/sites',{method:'POST',headers:H,body:JSON.stringify({url,name:document.getElementById('name').value.trim()||null})});
+  const s = await r.json(); document.getElementById('url').value=''; load();
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+load();
+</script></body></html>

@@ -1,0 +1,98 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Sales Concierge — сайт</title>
+<style>
+:root{--acc:#2563eb}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f6f7f9;margin:0;color:#111}
+.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:14px 28px;display:flex;align-items:center;gap:12px}
+.top a{color:#6b7280;text-decoration:none}.top b{font-size:16px}
+main{max-width:1100px;margin:24px auto;padding:0 20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px}.kpi b{font-size:26px;display:block}.kpi span{color:#6b7280;font-size:12px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;margin-bottom:18px}
+h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:10px}h2 .sp{flex:1}
+button{padding:8px 14px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:13px;cursor:pointer}
+button.sec{background:#fff;color:#111;border:1px solid #d1d5db}
+pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:10px;font-size:13px;overflow:auto;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;color:#6b7280;font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid #e5e7eb}td{padding:10px;border-bottom:1px solid #f3f4f6;vertical-align:top}
+.t{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600}.t.hot{background:#fee2e2;color:#991b1b}.t.warm{background:#fef3c7;color:#92400e}.t.cold{background:#e0f2fe;color:#075985}
+.muted{color:#6b7280;font-size:12px}
+label{display:block;font-size:12px;color:#6b7280;margin:10px 0 4px}
+input,textarea{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;font-family:inherit}
+textarea{min-height:70px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}.tabs button{background:#fff;color:#374151;border:1px solid #d1d5db}.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.conv{border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:10px}.conv .m{padding:6px 10px;border-radius:10px;margin:4px 0;max-width:80%;white-space:pre-wrap;font-size:13px}.conv .u{background:#dbeafe;margin-left:auto}.conv .a{background:#f3f4f6}
+.st{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px}.st.ready{background:#d1fae5;color:#065f46}.st.indexing{background:#fef3c7;color:#92400e}.st.error{background:#fee2e2;color:#991b1b}
+details summary{cursor:pointer;color:#374151;font-size:13px}
+</style></head><body>
+<div class="top"><a href="/admin">← Сайты</a><b id="title">…</b><span id="status"></span><span class="sp" style="flex:1"></span><a id="demo" target="_blank" href="#">открыть демо ↗</a></div>
+<main>
+<div class="grid"><div class="kpi"><b id="k1">–</b><span>диалогов</span></div><div class="kpi"><b id="k2">–</b><span>лидов</span></div><div class="kpi"><b id="k3">–</b><span>🔥 горячих</span></div><div class="kpi"><b id="k4">–</b><span>конверсия в лид</span></div></div>
+
+<div class="card"><h2>Установка на сайт<span class="sp"></span><button class="sec" onclick="copy()">Скопировать сниппет</button></h2>
+<pre id="snippet"></pre>
+<div class="muted">Вариант 1 — панель uCoz: «Управление дизайном → Глобальные блоки» (или шаблон «Общее для всех страниц» перед <code>&lt;/body&gt;</code>) → вставить строку → сохранить.<br>
+Вариант 2 — uCoz MCP из IDE/агента: «Добавь в глобальный блок перед &lt;/body&gt; скрипт: <i>[сниппет]</i>».</div></div>
+
+<div class="tabs"><button class="on" onclick="tab('leads',this)">Лиды</button><button onclick="tab('convs',this)">Диалоги</button><button onclick="tab('cfg',this)">Настройки агента</button><button onclick="tab('pages',this)">База знаний</button></div>
+
+<div class="card" id="tab-leads"><h2>Лиды<span class="sp"></span><span class="muted" id="leads-n"></span></h2><table><thead><tr><th>Когда</th><th>Контакт</th><th>Потребность</th><th>Резюме для менеджера</th><th>Темп.</th></tr></thead><tbody id="leads"></tbody></table></div>
+
+<div class="card" id="tab-convs" style="display:none"><h2>Диалоги</h2><div id="convs"></div></div>
+
+<div class="card" id="tab-cfg" style="display:none"><h2>Настройки агента<span class="sp"></span><button onclick="saveCfg()">Сохранить</button></h2>
+<label>Название сайта/компании</label><input id="c_name">
+<label>Имя агента</label><input id="c_agent">
+<label>Приветствие</label><textarea id="c_welcome"></textarea>
+<label>Быстрые кнопки (по одной в строке)</label><textarea id="c_quick"></textarea>
+<label>Тон общения</label><input id="c_tone">
+<label>Что выяснять у посетителя (квалификация, по одному пункту в строке)</label><textarea id="c_qual"></textarea>
+<label>Целевое действие (CTA)</label><input id="c_cta">
+<label>Фраза после получения контакта</label><input id="c_handoff">
+<label>Дополнительные знания (чего нет на сайте: часы, акции, правила, ответы на частые вопросы)</label><textarea id="c_extra" style="min-height:120px"></textarea>
+<label>Цвет виджета</label><input id="c_accent" type="color" style="width:80px;padding:2px">
+<div class="muted" id="cfg-msg" style="margin-top:8px"></div></div>
+
+<div class="card" id="tab-pages" style="display:none"><h2>База знаний<span class="sp"></span><button class="sec" onclick="reindex()">Переиндексировать</button></h2>
+<div style="display:flex;gap:8px;margin-bottom:12px"><input id="q" placeholder="Проверить поиск: что найдёт агент по запросу…"><button class="sec" onclick="search()">Найти</button></div>
+<div id="sres"></div>
+<table><thead><tr><th>Страница</th><th>Символов</th></tr></thead><tbody id="pages"></tbody></table></div>
+</main>
+<script>
+const SID='__SITE_ID__';
+const T = document.cookie.match(/admin_token=([^;]+)/)?.[1] || new URLSearchParams(location.search).get('token');
+const H = {'X-Admin-Token': T, 'Content-Type': 'application/json'};
+let site=null;
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function dt(ts){return new Date(ts*1000).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function tab(n,b){document.querySelectorAll('[id^=tab-]').forEach(e=>e.style.display='none');document.getElementById('tab-'+n).style.display='';document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+async function load(){
+  const r=await fetch('/api/sites/'+SID,{headers:H}); if(r.status===401){location.href='/admin';return} site=await r.json();
+  document.getElementById('title').textContent=site.name||site.url; document.title=(site.name||site.url)+' — Concierge';
+  document.getElementById('status').innerHTML=`<span class="st ${site.status}">${site.status==='ready'?'готов · '+site.pages_count+' стр.':esc(site.status_detail||site.status)}</span>`;
+  document.getElementById('demo').href='/demo/'+SID+'?concierge=open';
+  const s=site.stats; k1.textContent=s.conversations; k2.textContent=s.leads; k3.textContent=s.hot_leads; k4.textContent=s.conversion+'%';
+  document.getElementById('snippet').textContent=`<script src="${location.origin}/widget.js" data-site="${SID}" defer><\/script>`;
+  const c=site.config; c_name.value=site.name||''; c_agent.value=c.agent_name; c_welcome.value=c.welcome; c_quick.value=(c.quick_replies||[]).join('\n'); c_tone.value=c.tone; c_qual.value=(c.qualification||[]).join('\n'); c_cta.value=c.cta; c_handoff.value=c.handoff; c_extra.value=c.extra_knowledge||''; c_accent.value=c.accent||'#2563eb';
+  document.getElementById('pages').innerHTML=site.pages.map(p=>`<tr><td><a href="${esc(p.url)}" target="_blank">${esc(p.title)}</a><div class="muted">${esc(p.url)}</div></td><td>${p.size}</td></tr>`).join('');
+  loadLeads(); loadConvs();
+  if(site.status!=='ready') setTimeout(load,1500);
+}
+async function loadLeads(){
+  const L=await (await fetch(`/api/sites/${SID}/leads`,{headers:H})).json();
+  document.getElementById('leads-n').textContent=L.length? L.length+' шт.':'';
+  document.getElementById('leads').innerHTML=L.map(l=>`<tr><td class="muted">${dt(l.created_at)}</td><td><b>${esc(l.name||'—')}</b><br>${esc(l.phone||'')}${l.phone&&l.email?'<br>':''}${esc(l.email||'')}</td><td>${esc(l.need||'')}</td><td>${esc(l.summary||'')}<div class="muted">диалог ${l.conversation_id}</div></td><td><span class="t ${l.temperature}">${l.temperature}</span></td></tr>`).join('')||'<tr><td colspan=5 class="muted">Лидов пока нет — откройте демо и поговорите с агентом</td></tr>';
+}
+async function loadConvs(){
+  const C=await (await fetch(`/api/sites/${SID}/conversations`,{headers:H})).json();
+  document.getElementById('convs').innerHTML=C.map(c=>`<div class="conv"><div class="muted">${dt(c.updated_at)} · ${c.id} · ${c.messages.length} сообщ.${c.messages.some(m=>m.lead_id)?' · <b style="color:#065f46">лид</b>':''}</div>${c.messages.map(m=>`<div class="m ${m.role==='user'?'u':'a'}">${esc(m.content)}${m.latency?`<div class="muted">${m.latency}s</div>`:''}</div>`).join('')}</div>`).join('')||'<div class="muted">Диалогов пока нет</div>';
+}
+async function saveCfg(){
+  const cfg={agent_name:c_agent.value,welcome:c_welcome.value,quick_replies:c_quick.value.split('\n').map(s=>s.trim()).filter(Boolean),tone:c_tone.value,qualification:c_qual.value.split('\n').map(s=>s.trim()).filter(Boolean),cta:c_cta.value,handoff:c_handoff.value,extra_knowledge:c_extra.value,accent:c_accent.value};
+  const r=await fetch(`/api/sites/${SID}/config`,{method:'PUT',headers:H,body:JSON.stringify({name:c_name.value,config:cfg})});
+  document.getElementById('cfg-msg').textContent=r.ok?'Сохранено ✓ — применится к следующему сообщению':'Ошибка сохранения'; load();
+}
+async function reindex(){await fetch(`/api/sites/${SID}/reindex`,{method:'POST',headers:H}); load();}
+async function search(){const q=document.getElementById('q').value; const R=await (await fetch(`/api/sites/${SID}/search?q=`+encodeURIComponent(q),{headers:H})).json();
+  document.getElementById('sres').innerHTML=R.map(c=>`<details><summary>${c.score.toFixed(1)} · ${esc(c.title)}</summary><pre style="background:#f3f4f6;color:#111">${esc(c.text)}</pre></details>`).join('')||'<div class="muted">ничего не найдено</div>';}
+function copy(){navigator.clipboard.writeText(document.getElementById('snippet').textContent)}
+load();
+</script></body></html>

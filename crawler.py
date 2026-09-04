@@ -21,7 +21,9 @@ UA = "Mozilla/5.0 (compatible; uCozSalesConcierge/0.1; +https://www.ucoz.ru)"
 
 SKIP_PATTERNS = re.compile(
     r"(/register|/login|/logout|/search|/rss|/sitemap|/index/8|/index/3|/index/40|/index/10|"
-    r"/index/sub|/index/\d+-\d+-\d+-\d+|\?|/_|/tags/|/feed|/print|/stat/|/dir/0|/board/0)",
+    r"/index/sub|/index/\d+-\d+-\d+-\d+|/index/0-\d+$|\?|/_|/tags/|/feed|/print|/stat/|/dir/|/board/|/load/|/forum/|/photo/|"
+    r"/(news|blog)/\d{4}-\d{2}|/(news|publ|shop|blog|load|dir|board|photo|stuff)/\d+-\d+-\d+(-\d+)*/?$|"
+    r"/shop/(wishlist|compare|basket|checkout|usergoods)|/mchat|/gb/)",
     re.I,
 )
 SKIP_EXT = re.compile(r"\.(jpg|jpeg|png|gif|webp|svg|pdf|zip|rar|doc|docx|xls|xlsx|mp3|mp4|avi|css|js|xml|ico)$", re.I)

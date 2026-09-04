@@ -74,6 +74,21 @@ def _extract(html: str, url: str) -> tuple[str, list[str], list[str]]:
         t.decompose()
 
     body = soup.body or soup
+    # Tables -> one line per row ("Header: cell; Header: cell") so prices stay attached to their row
+    for table in body.find_all("table"):
+        headers = [th.get_text(" ", strip=True) for th in table.find_all("th")]
+        rows = []
+        for tr in table.find_all("tr"):
+            cells = [td.get_text(" ", strip=True) for td in tr.find_all("td")]
+            if not cells:
+                continue
+            if headers and len(cells) == len(headers):
+                rows.append("; ".join(f"{h}: {c}" for h, c in zip(headers, cells) if c))
+            else:
+                rows.append(" | ".join(c for c in cells if c))
+        new = soup.new_tag("div")
+        new.string = "\n" + "\n".join(rows) + "\n"
+        table.replace_with(new)
     # Insert newlines around block elements
     for tag in body.find_all(["p", "div", "li", "tr", "br", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th", "section", "article", "dt", "dd"]):
         tag.insert_before("\n")
